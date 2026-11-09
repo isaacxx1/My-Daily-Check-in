@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#101923">
+<title>My Daily Check-in</title>
+<style>
+:root{
+  --bg:var(--tg-theme-bg-color,#101923);
+  --panel:var(--tg-theme-secondary-bg-color,#192532);
+  --text:var(--tg-theme-text-color,#edf3f8);
+  --muted:var(--tg-theme-hint-color,#9aabba);
+  --accent:var(--tg-theme-button-color,#65a9e8);
+  --accentText:var(--tg-theme-button-text-color,#071522);
+  --line:rgba(150,175,195,.18);
+  --good:#54b78a; --mid:#e3b45c; --high:#e87979;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.48 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:760px;margin:auto;padding:18px 15px 100px}
+header{padding:8px 2px 18px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+h1{font-size:27px;line-height:1.15;margin:6px 0 7px}
+h2{font-size:20px;margin:0 0 7px}
+h3{font-size:16px;margin:0}
+p{margin:7px 0;color:var(--muted)}
+.small{font-size:12px;color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+.hero{background:linear-gradient(135deg,rgba(101,169,232,.18),rgba(84,183,138,.08));}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pill{font-size:11px;padding:4px 9px;border-radius:30px;background:rgba(101,169,232,.15);color:var(--accent);white-space:nowrap}
+button{border:0;border-radius:12px;padding:12px 15px;font-weight:700;font-size:14px;background:var(--accent);color:var(--accentText);cursor:pointer}
+button.secondary{background:rgba(140,165,185,.13);color:var(--text);border:1px solid var(--line)}
+button.ghost{background:transparent;color:var(--accent);padding:8px}
+button:active{transform:scale(.985)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+nav{position:fixed;z-index:5;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+.navinner{max-width:760px;width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.navbtn{background:transparent;color:var(--muted);font-size:11px;padding:8px 4px;border-radius:11px}
+.navbtn.active{background:var(--panel);color:var(--text)}
+.navbtn span{display:block;font-size:18px;margin-bottom:2px}
+.page{display:none}.page.active{display:block}
+.assessment{border:1px solid var(--line);border-radius:15px;padding:14px;margin:10px 0;background:rgba(255,255,255,.015)}
+.assessment p{font-size:13px;margin:4px 0 10px}
+.field{margin:16px 0}
+.field label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.field .hint{font-size:12px;color:var(--muted);margin-bottom:7px}
+.scale{display:flex;align-items:center;gap:10px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.score{min-width:34px;text-align:center;font-variant-numeric:tabular-nums;font-weight:700;background:rgba(255,255,255,.08);padding:5px;border-radius:8px}
+.scaleends{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px}
+textarea,input[type=text]{width:100%;background:rgba(0,0,0,.12);border:1px solid var(--line);border-radius:11px;padding:11px;color:var(--text);font:inherit}
+textarea{min-height:76px;resize:vertical}
+.sectionhead{margin:22px 2px 8px}
+.metric{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:8px 0;border-bottom:1px solid var(--line)}
+.metric:last-child{border:0}
+.bar{height:7px;background:rgba(255,255,255,.1);border-radius:9px;overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:9px}
+.notice{font-size:12px;border-left:3px solid var(--mid);padding:9px 11px;background:rgba(227,180,92,.08);border-radius:0 9px 9px 0;color:var(--muted);margin:12px 0}
+.sessiontext{white-space:pre-wrap;line-height:1.8;color:var(--text);font-size:15px}
+.sessiontext .pause{color:var(--muted);font-style:italic}
+.empty{text-align:center;padding:26px 12px;color:var(--muted)}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:22px 5px}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="eyebrow">Personal wellbeing workspace</div>
+  <h1>My Daily Check-in</h1>
+  <p>A private place to notice patterns, not judge yourself.</p>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="card hero">
+    <div class="eyebrow">Today</div>
+    <h2>Start where you are.</h2>
+    <p>Choose one short check-in. You do not need to complete every assessment every day.</p>
+    <div class="actions"><button onclick="showPage('assess')">Open assessments</button><button class="secondary" onclick="showPage('sessions')">Guided sessions</button></div>
+  </div>
+  <div class="card">
+    <div class="row"><h3>Today's saved check-ins</h3><span class="pill" id="todayCount">0 saved</span></div>
+    <div id="todaySummary" class="empty">Nothing saved today yet. That's okay.</div>
+  </div>
+  <div class="sectionhead"><h2>Assessment library</h2><p>Each card opens its own set of fields and sliders.</p></div>
+  <div id="homeAssessments"></div>
+  <div class="notice">Use ratings as rough snapshots, not diagnostic scores. Record once and move on; don't repeat a check-in to get a “right” answer.</div>
+</section>
+
+<section id="assess" class="page">
+  <div class="row"><div><div class="eyebrow">Your assessment library</div><h2>Choose a check-in</h2></div><span class="pill">0–10 scale</span></div>
+  <p>0 = not present · 10 = extremely strong. Rate how it has been recently, without reconstructing every moment.</p>
+  <div id="assessmentList"></div>
+</section>
+
+<section id="form" class="page">
+  <button class="ghost" onclick="showPage('assess')">← All assessments</button>
+  <div class="eyebrow" id="formEyebrow">Check-in</div>
+  <h2 id="formTitle">Assessment</h2>
+  <p id="formDesc"></p>
+  <div class="notice">There are no good or bad scores. The number is simply a rough observation of this moment or day.</div>
+  <div id="formFields"></div>
+  <div class="field"><label for="note">Optional note</label><div class="hint">One short observation, if useful. You can leave this blank.</div><textarea id="note" placeholder="What was happening around me? What helped me rejoin my day?"></textarea></div>
+  <div class="actions"><button onclick="saveAssessment()">Save check-in</button><button class="secondary" onclick="showPage('assess')">Cancel</button></div>
+</section>
+
+<section id="sessions" class="page">
+  <div class="eyebrow">Guided therapy-style audio scripts</div>
+  <h2>Listen, imagine, pause.</h2>
+  <p>These are written for slow read-aloud. Use your device's Read Aloud feature. The pause markers invite silence; the app cannot control the voice or insert real audio pauses.</p>
+  <div id="sessionList"></div>
+  <div class="notice">These are self-guided exercises, not a replacement for therapy. If an exercise increases distress, stop and orient to the room.</div>
+</section>
+
+<section id="sessionView" class="page">
+  <button class="ghost" onclick="showPage('sessions')">← All sessions</button>
+  <div class="eyebrow">Guided session</div>
+  <h2 id="sessionTitle"></h2>
+  <p id="sessionMeta"></p>
+  <div class="card"><div id="sessionBody" class="sessiontext"></div></div>
+  <div class="actions"><button class="secondary" onclick="showPage('sessions')">Finish session</button></div>
+</section>
+
+<section id="history" class="page">
+  <div class="eyebrow">Your saved observations</div><h2>History</h2>
+  <p>Stored on this device/browser only. Nothing is sent to a server.</p>
+  <div id="historyList"></div>
+  <div class="actions"><button class="secondary" onclick="exportData()">Export data</button><button class="secondary" onclick="clearData()">Delete all saved data</button></div>
+</section>
+</main>
+<footer>Small observations. Ordinary life. No need to make a perfect day.</footer>
+</div>
+
+<nav><div class="navinner">
+<button class="navbtn active" data-page="home" onclick="showPage('home')"><span>⌂</span>Home</button>
+<button class="navbtn" data-page="assess" onclick="showPage('assess')"><span>◉</span>Assess</button>
+<button class="navbtn" data-page="sessions" onclick="showPage('sessions')"><span>♫</span>Sessions</button>
+<button class="navbtn" data-page="history" onclick="showPage('history')"><span>▤</span>History</button>
+</div></nav>
+
+<script>
+const assessments = [
+{id:'daily',title:'Daily mental state',tag:'Daily',desc:'A broad snapshot of how your mind and emotions are showing up today.',items:[
+['Anxiety','How strong is the general anxiety or inner alarm?'],
+['Intrusive thoughts','How frequent or sticky are unwanted thoughts?'],
+['OCD generation','How strongly is OCD creating doubts, rules, questions or mental loops?'],
+['Meh / disengagement','How strong is the flat, disconnected or “meh” feeling?'],
+['Mind resistance','How much resistance do you feel toward doing, resting or simply being?'],
+['Freedom to act','How difficult is it to choose an action without first resolving thoughts?','reverse']
+]},
+{id:'morning',title:'Morning start & engagement',tag:'Morning',desc:'Notice the starting conditions without demanding a perfect day.',items:[
+['Uncomfortable emotion','How strong is the uncomfortable emotional atmosphere?'],
+['OCD doubt','How much are doubts asking for analysis or certainty?'],
+['Day perfectionism','How much pressure is there to make today go exactly right?'],
+['Resistance to engaging','How much resistance appears when you approach a meaningful task?'],
+['Escape / switching urge','How strong is the urge to abandon the current task and find another plan?'],
+['Willingness to begin','How willing are you to take one imperfect step?','reverse']
+]},
+{id:'lowmood',title:'Mood, energy & motivation',tag:'Mood',desc:'Track low mood without treating it as a personal failure.',items:[
+['Low mood','How heavy or low does your mood feel?'],
+['Disheartenment','How discouraged or defeated do you feel?'],
+['Low energy','How depleted does your physical or mental energy feel?'],
+['Lack of motivation','How difficult is it to initiate something?'],
+['Loss of interest','How little interest or pleasure do things seem to offer?'],
+['Ability to engage','How available does engagement feel, even if mood is low?','reverse']
+]},
+{id:'control',title:'Control & judgment sensitivity',tag:'OCD pattern',desc:'Observe the cycle where uncertainty makes small imperfections feel significant.',items:[
+['Control urgency','How strong is the need to control, fix or settle things?'],
+['Uncertainty intolerance','How difficult is it to leave something unresolved?'],
+['Imperfection sensitivity','How strongly do small flaws affect your emotional state?'],
+['Global judgment','How much does one problem make everything seem wrong?'],
+['Resistance / fighting','How much energy is spent fighting feelings, thoughts or circumstances?'],
+['Mental monitoring','How much are you checking your thoughts, feelings or other people’s reactions?'],
+['Ability to leave it alone','How able are you to let something remain unfinished or uncertain?','reverse']
+]},
+{id:'reality',title:'Reality & interpretation check',tag:'Perception',desc:'Separate emotional atmosphere from the conclusions the mind draws from it.',items:[
+['Negative self-perception','How negatively are you seeing or judging yourself?'],
+['Negative view of others','How negatively or suspiciously are you interpreting other people?'],
+['Glum view of life','How dark, hopeless or globally wrong does life seem?'],
+['Emotional reasoning','How much does “it feels true” become “it must be true”?'],
+['OCD interpretation','How much are OCD themes shaping the meaning of events?'],
+['Resistance / hypersensitivity','How strongly do ordinary things feel personal, targeted or difficult to tolerate?'],
+['Catastrophic meaning','How much does a small event seem to predict a bigger failure or destiny?'],
+['Mental rigidity','How difficult is it to consider other interpretations or leave the question open?']
+]},
+{id:'workload',title:'Workload, rush & saturation',tag:'Work',desc:'Notice mental load, open loops and difficulty switching off.',items:[
+['Rush / urgency','How pressured or rushed do you feel?'],
+['Open tabs / unfinished tasks','How much mental space is occupied by unfinished tasks?'],
+['Work anxiety','How anxious do work demands make you feel?'],
+['Mental saturation','How full, overloaded or saturated does your mind feel?'],
+['Hyperactivation','How wired, restless or over-activated do you feel?'],
+['Difficulty switching off','How difficult is it to pause work-related thinking?'],
+['Ability to choose one task','How able are you to focus on one manageable next step?','reverse']
+]},
+{id:'sleep',title:'Sleep & pre-sleep mind',tag:'Sleep',desc:'A short evening snapshot. It is not a sleep-performance test.',items:[
+['Mental activity','How busy or active is your mind as you prepare for sleep?'],
+['Task / memory worry','How worried are you about forgetting tasks or plans?'],
+['Pressure to sleep','How much pressure are you putting on yourself to fall asleep?'],
+['OCD analysis at bedtime','How much are doubts or mental reviews keeping you engaged?'],
+['Body tension','How tense or activated does your body feel?'],
+['Permission to rest','How able are you to let rest happen without earning it?','reverse']
+]}
+];
+
+const sessions = [
+{id:'tunnel',title:'Leaving the mental tunnel',meta:'OCD loops · resistance · returning to the present',body:`Let's begin.\n\nClose your eyes, if that feels comfortable.\n\nTake your time. There's nowhere you need to go right now.\n\nFeel the place where your body meets the surface beneath you.\nNotice its weight. Notice how the surface supports you.\n\n[PAUSE — 15 seconds]\n\nNow imagine you've been walking through a long corridor. There are doors along the walls. Behind every door, there's a question: about your past, yourself, another person, or tomorrow.\n\nEvery time you open one door, another corridor appears.\n\nImagine, just for a moment, that you stop walking.\nYou don't need to open another door. You don't need to close the ones behind you.\n\n[PAUSE — 20 seconds]\n\nAt the end of the corridor, imagine a door opening onto a wide landscape. There is a sky. Perhaps trees. Perhaps a little wind. Nothing special is required to happen.\n\nTake time to picture the distance. The light. The space around you.\n\n[PAUSE — 25 seconds]\n\nSome thoughts may follow you outside. That's okay. They can come along. They don't need to occupy the whole landscape.\nThere's room for thoughts, and room for the sky.\n\n[PAUSE — 20 seconds]\n\nYou can leave a question unanswered and still choose what to do next. You can feel resistance and still take one ordinary step.\n\nNo need to recover lost time. No need to make the rest of the day perfect.\n\n[PAUSE — 15 seconds]\n\nNow notice the actual room again. The surface beneath you. The sounds around you. When you're ready, open your eyes.\n\nDon't check whether you feel better. Simply return to one ordinary thing.`},
+{id:'glum',title:'When everything feels wrong',meta:'Glum atmosphere · self and other judgments · emotional reasoning',body:`Settle into a comfortable position.\n\nLet your eyes close gently. Notice the room around you, even with your eyes closed.\n\n[PAUSE — 15 seconds]\n\nImagine the emotional atmosphere inside you as weather. Maybe the sky is grey. Maybe the air feels cold or heavy. You don't need to change the weather.\n\nJust notice: this is the atmosphere I'm experiencing right now.\n\n[PAUSE — 25 seconds]\n\nNow imagine standing beside a window and looking out. The weather outside may be similar, or completely different. There are buildings, distant people, ordinary things continuing their day.\n\nYour inner weather is real as an experience. But it does not have to be a complete description of everything outside you.\n\n[PAUSE — 25 seconds]\n\nIf your mind judges you, notice that a judgment is happening. If it judges someone else, notice that too. You don't have to force a positive interpretation. You also don't have to accept the first negative interpretation as the final truth.\n\nFor now, let the question remain open.\n\n[PAUSE — 20 seconds]\n\nImagine the clouds moving without needing to disappear. The sky doesn't have to win an argument with the clouds.\n\nAnd you don't have to win an argument with your mind.\n\n[PAUSE — 20 seconds]\n\nFeel the support beneath your body. Hear the sounds around you. Let the emotional atmosphere be present while the rest of the world is present too.\n\nWhen you're ready, return to the room. Choose one ordinary next moment. Not a solution to your whole life. Just the next moment.`},
+{id:'overload',title:'When the mind is overloaded',meta:'Open tasks · urgency · saturation · switching',body:`Find a position that gives your body a little support.\n\nNotice your shoulders. Your hands. Your feet.\n\nYou don't need to relax them. Just notice where they are.\n\n[PAUSE — 15 seconds]\n\nImagine a desk with many papers on it. Each paper represents an unfinished task, a plan, a message, or something you feel you should remember.\n\nLook at the desk from a little distance.\n\nYou do not have to sort every paper right now.\n\n[PAUSE — 20 seconds]\n\nImagine choosing just one paper and placing it gently to one side. Not because it is the most important thing in your life. Simply because it is the next small thing you can work with.\n\nThe other papers can remain on the desk.\n\n[PAUSE — 20 seconds]\n\nNotice the urge to rush, switch tasks, or build a completely new plan. You can notice that urge without obeying it immediately.\n\nA mind can feel crowded, and one small action can still be possible.\n\n[PAUSE — 20 seconds]\n\nNow imagine doing one modest part of a task. Not the whole project. Not a perfect beginning. Just one part.\n\nLet it be ordinary.\n\n[PAUSE — 20 seconds]\n\nReturn to the room. When you open your eyes, choose one small next action. You don't need to clear the entire desk before beginning.`},
+{id:'rest',title:'Allowing rest without earning it',meta:'Bedtime · task worries · pressure to sleep',body:`Let yourself settle.\n\nNotice the support beneath you. Let your hands rest where they are.\n\n[PAUSE — 20 seconds]\n\nPerhaps your mind is listing things you need to remember. Perhaps it is planning tomorrow or warning you that tomorrow will be difficult if you don't sleep well.\n\nYou don't need to debate with those thoughts now.\n\n[PAUSE — 15 seconds]\n\nImagine placing a small notebook beside the bed. If there is one genuinely useful task to remember, you can write it down once. Then the notebook can stay there. You do not need to keep checking it in your mind.\n\n[PAUSE — 20 seconds]\n\nRest is not a reward for completing everything. The day can be unfinished. Tomorrow can be imperfect. You don't need a guarantee about how tomorrow will go.\n\n[PAUSE — 25 seconds]\n\nNotice the quiet around you. Maybe sleep comes, maybe it takes time. You don't have to turn resting into another task to perform correctly.\n\nLet this moment be enough for now.`}
+];
+
+let activeAssessment=null;
+function showPage(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+ document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===id || (id==='form'&&b.dataset.page==='assess') || (id==='sessionView'&&b.dataset.page==='sessions')));
+ window.scrollTo(0,0);
+ if(id==='home')renderHome(); if(id==='history')renderHistory();
+}
+function cardHTML(a){return `<div class="assessment"><div class="row"><h3>${a.title}</h3><span class="pill">${a.tag}</span></div><p>${a.desc}</p><button onclick="openAssessment('${a.id}')">Open assessment →</button></div>`}
+function renderHome(){document.getElementById('homeAssessments').innerHTML=assessments.map(cardHTML).join('');
+ const all=getData(), today=new Date().toISOString().slice(0,10), entries=all.filter(x=>x.date===today);
+ document.getElementById('todayCount').textContent=entries.length+' saved';
+ document.getElementById('todaySummary').innerHTML=entries.length?entries.map(e=>`<div class="metric"><span>${esc(e.title)}</span><strong>${e.average}/10</strong></div>`).join(''):'Nothing saved today yet. That’s okay.';}
+function renderAssessments(){document.getElementById('assessmentList').innerHTML=assessments.map(cardHTML).join('')}
+function openAssessment(id){
+ activeAssessment=assessments.find(a=>a.id===id); if(!activeAssessment)return;
+ document.getElementById('formTitle').textContent=activeAssessment.title;
+ document.getElementById('formDesc').textContent=activeAssessment.desc;
+ document.getElementById('formEyebrow').textContent=activeAssessment.tag+' check-in';
+ document.getElementById('note').value='';
+ document.getElementById('formFields').innerHTML=activeAssessment.items.map((it,i)=>`<div class="field"><label for="r${i}">${it[0]}</label><div class="hint">${it[1]}</div><div class="scale"><input id="r${i}" type="range" min="0" max="10" value="5" oninput="document.getElementById('v${i}').textContent=this.value"><span class="score" id="v${i}">5</span></div><div class="scaleends"><span>0 · not present</span><span>10 · extremely strong</span></div></div>`).join('');
+ showPage('form');
+}
+function getData(){try{return JSON.parse(localStorage.getItem('dailyCheckins')||'[]')}catch(e){return[]}}
+function saveAssessment(){
+ if(!activeAssessment)return;
+ const values=activeAssessment.items.map((it,i)=>Number(document.getElementById('r'+i).value));
+ const entry={id:Date.now(),assessment:activeAssessment.id,title:activeAssessment.title,date:new Date().toISOString().slice(0,10),time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),values:values.map((v,i)=>({label:activeAssessment.items[i][0],value:v})),average:(values.reduce((a,b)=>a+b,0)/values.length).toFixed(1),note:document.getElementById('note').value.trim()};
+ const data=getData();data.unshift(entry);localStorage.setItem('dailyCheckins',JSON.stringify(data));
+ showPage('home');
+}
+function renderSessions(){document.getElementById('sessionList').innerHTML=sessions.map(s=>`<div class="assessment"><h3>${s.title}</h3><p>${s.meta}</p><button onclick="openSession('${s.id}')">Begin session →</button></div>`).join('')}
+function openSession(id){const s=sessions.find(x=>x.id===id);if(!s)return;document.getElementById('sessionTitle').textContent=s.title;document.getElementById('sessionMeta').textContent=s.meta;document.getElementById('sessionBody').textContent=s.body;showPage('sessionView')}
+function renderHistory(){
+ const data=getData(), el=document.getElementById('historyList');
+ el.innerHTML=data.length?data.map(e=>`<div class="card"><div class="row"><h3>${esc(e.title)}</h3><span class="pill">${e.date} · ${e.time}</span></div><div class="row"><strong>Average: ${e.average}/10</strong><button class="ghost" onclick="toggleEntry(${e.id})">Details</button></div><div id="entry${e.id}" class="hidden">${e.values.map(v=>`<div class="metric"><span>${esc(v.label)}</span><strong>${v.value}/10</strong></div>`).join('')}${e.note?`<p>${esc(e.note)}</p>`:''}</div></div>`).join(''):'<div class="empty">No saved check-ins yet.</div>';
+}
+function toggleEntry(id){document.getElementById('entry'+id).classList.toggle('hidden')}
+function exportData(){const blob=new Blob([JSON.stringify(getData(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='daily-checkins.json';a.click();URL.revokeObjectURL(a.href)}
+function clearData(){if(confirm('Delete all saved check-ins from this device?')){localStorage.removeItem('dailyCheckins');renderHistory();renderHome()}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+renderHome();renderAssessments();renderSessions();
+</script>
+</body>
+</html>
